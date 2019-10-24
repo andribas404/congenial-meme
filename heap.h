@@ -25,6 +25,7 @@ class heap::FibonacciHeap {
  public:
     FibonacciHeap();
     FibonacciHeap(Node* node);
+    ~FibonacciHeap();
     void insert(Node* node);
     Node* find_min();
     void meld(FibonacciHeap* h);
@@ -32,7 +33,10 @@ class heap::FibonacciHeap {
     void decrease_key(Node* node, int newkey);
     Node* delete_node(Node* node);
 
-    bool empty() { return min_node == NULL; }
+    bool empty() { return find_min() == NULL; }
+    void push(int x, int key);
+    void pop();
+    int top();
 
  protected:
     void _set_min(Node* node);

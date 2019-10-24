@@ -1,4 +1,6 @@
 #include <unordered_map>
+#include <vector>
+
 #include "heap.h"
 
 using namespace heap;
@@ -51,6 +53,7 @@ void FibonacciHeap::insert(Node* node) {
     FibonacciHeap* h2 = new FibonacciHeap();
     h2->_set_min(node);
     meld(h2);
+    h2->_set_min(NULL);
     delete h2;
 }
 
@@ -189,6 +192,7 @@ Node* FibonacciHeap::delete_min() {
     //Создаем новую кучу из потомков root (у них прежний parent)
     FibonacciHeap* h = new FibonacciHeap(root->child);
     meld(h);
+    h->_set_min(NULL);
     delete h;
     _consolidate();
     root->_extract();
@@ -422,9 +426,55 @@ Node* FibonacciHeap::delete_node(Node* node) {
 
     FibonacciHeap* h = new FibonacciHeap(node->child);
     meld(h);
+    h->_set_min(NULL);
     delete h;
     _consolidate();
     node->_extract();
     node->child = NULL;
     return node;
+}
+
+void FibonacciHeap::push(int x, int key) {
+    Node* node = new Node(x, key);
+    insert(node);
+}
+
+void FibonacciHeap::pop() {
+    Node* node = delete_min();
+    if (node == NULL) {
+        throw "Куча пуста";
+    }
+    delete node;
+}
+
+int FibonacciHeap::top() {
+    Node* node = find_min();
+    if (node == NULL) {
+        throw "Куча пуста";
+    }
+    return node->x;
+}
+
+FibonacciHeap::~FibonacciHeap() {
+    if (min_node == NULL) {
+        return;
+    }
+    std::vector<Node*> v {min_node};
+
+    while (!v.empty()) {
+        Node* node = v.back();
+        v.pop_back();
+        if (node == NULL) {
+            continue;
+        }
+        Node* right = node->right;
+        while (right != node) {
+            v.push_back(right->child);
+            Node* node_next = right->right;
+            delete right;
+            right = node_next;
+        }
+        v.push_back(node->child);
+        delete node;
+    }
 }
